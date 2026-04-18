@@ -86,6 +86,13 @@ function JumpDropdown() {
         isSub: true,
         parentId: s.closest('[data-section-num]')?.id,
       }));
+      // sort by DOM order so subsections appear below their parent
+      arr.sort((a, b) => {
+        const na = document.getElementById(a.id);
+        const nb = document.getElementById(b.id);
+        if (!na || !nb) return 0;
+        return na.compareDocumentPosition(nb) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1;
+      });
       setSections(arr);
     };
     const t = setTimeout(collect, 100);
