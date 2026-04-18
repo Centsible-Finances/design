@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Centsible · Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: #FBF4EC;
+    color: #3A2E26;
+    font-family: 'Nunito', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wrap { max-width: 480px; width: 100%; padding: 48px 32px; text-align: center; }
+  h1 {
+    font-family: 'Newsreader', serif;
+    font-size: 2.4rem;
+    font-weight: 500;
+    margin: 0 0 8px;
+    color: #3A2E26;
+  }
+  .sub { color: #7A6A5C; font-size: 1rem; margin: 0 0 48px; }
+  .links { display: flex; flex-direction: column; gap: 14px; }
+  a.card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: #fff;
+    border: 1.5px solid #EAD9C8;
+    border-radius: 16px;
+    padding: 20px 24px;
+    text-decoration: none;
+    color: #3A2E26;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  a.card:hover { box-shadow: 0 4px 18px rgba(58,46,38,0.10); transform: translateY(-1px); }
+  .icon { font-size: 1.6rem; flex-shrink: 0; }
+  .label { font-weight: 700; font-size: 1rem; }
+  .desc { font-size: 0.82rem; color: #7A6A5C; margin-top: 2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Centsible</h1>
+  <p class="sub">Design resources</p>
+  <div class="links">
+    <a class="card" href="design-system.html">
+      <span class="icon">🎨</span>
+      <div>
+        <div class="label">Design System</div>
+        <div class="desc">Color tokens, typography, components &amp; glyphs</div>
+      </div>
+    </a>
+    <a class="card" href="Centsible.html">
+      <span class="icon">📱</span>
+      <div>
+        <div class="label">App Prototype</div>
+        <div class="desc">Interactive dashboard and screen flows</div>
+      </div>
+    </a>
+    <a class="card" href="Centsible Logo.html">
+      <span class="icon">✦</span>
+      <div>
+        <div class="label">Logo</div>
+        <div class="desc">Logomarks and brand identity</div>
+      </div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

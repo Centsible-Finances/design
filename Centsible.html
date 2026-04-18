@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Centsible · A cozy money journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh;
+    background:
+      radial-gradient(ellipse at 20% 10%, #E8D7C5 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 80%, #D9CFE3 0%, transparent 55%),
+      linear-gradient(160deg, #EFE4D1 0%, #E3D3C0 100%);
+    font-family: 'Nunito', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+    padding: 30px 0;
+    overflow-x: hidden;
+  }
+  body.dark {
+    background:
+      radial-gradient(ellipse at 20% 10%, #3D2E36 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, #2D2540 0%, transparent 50%),
+      linear-gradient(160deg, #1A1620 0%, #0F0C14 100%);
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes wiggle {
+    0% { transform: rotate(-0.4deg) scale(0.985); }
+    100% { transform: rotate(0.4deg) scale(0.985); }
+  }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+
+  input[type=range] { height: 22px; background: transparent; }
+  input[type=range]::-webkit-slider-runnable-track {
+    height: 8px; border-radius: 4px; background: rgba(0,0,0,0.08);
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; border: 2px solid currentColor;
+    margin-top: -7px; cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+
+  /* the device shell — we build our own instead of using IOSDevice so the tab bar
+     can be pinned OUTSIDE the scrolling content area */
+  .cs-device {
+    width: 402px; height: 874px; border-radius: 48px; overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12);
+    font-family: 'Nunito', sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .cs-island {
+    position: absolute; top: 11px; left: 50%; transform: translateX(-50%);
+    width: 126px; height: 37px; border-radius: 24px; background: #000; z-index: 50;
+  }
+  .cs-home-indicator {
+    position: absolute; bottom: 0; left: 0; right: 0; z-index: 60;
+    height: 34px; display: flex; justify-content: center; align-items: flex-end;
+    padding-bottom: 8px; pointer-events: none;
+  }
+  .cs-home-indicator > div {
+    width: 139px; height: 5px; border-radius: 100px;
+    background: rgba(0,0,0,0.25);
+  }
+  .dark-frame .cs-home-indicator > div { background: rgba(255,255,255,0.7); }
+
+  .cs-scroll {
+    position: absolute; inset: 0; overflow-y: auto; overflow-x: hidden;
+    padding-bottom: 120px; /* make room for fixed tab bar */
+  }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="tokens.jsx"></script>
+<script type="text/babel" src="widgets.jsx"></script>
+<script type="text/babel" src="pockets.jsx"></script>
+<script type="text/babel" src="screens.jsx"></script>
+<script type="text/babel" src="dashboard.jsx"></script>
+<script type="text/babel" src="tweaks.jsx"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "palette": "peach",
+  "density": "cozy",
+  "roundness": 26,
+  "plush": 0.6,
+  "voice": "observer",
+  "dark": false
+}/*EDITMODE-END*/;
+
+function App() {
+  const [tweaks, setTweaks] = useState(TWEAK_DEFAULTS);
+  const [tweaksOpen, setTweaksOpen] = useState(false);
+  const [tab, setTab] = useState(() => localStorage.getItem('cs_tab') || 'home');
+  const [txnOpen, setTxnOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [summaryOpen, setSummaryOpen] = useState(false);
+  const scrollRef = useRef(null);
+  const [layout, setLayout] = useState(() => {
+    try {
+      const saved = localStorage.getItem('cs_layout');
+      return saved ? JSON.parse(saved) : DEFAULT_LAYOUT;
+    } catch { return DEFAULT_LAYOUT; }
+  });
+
+  useEffect(() => { localStorage.setItem('cs_layout', JSON.stringify(layout)); }, [layout]);
+  useEffect(() => { localStorage.setItem('cs_tab', tab || 'home'); }, [tab]);
+
+  // Scroll to top on tab change
+  useEffect(() => { if (scrollRef.current) scrollRef.current.scrollTop = 0; }, [tab]);
+
+  // Tweaks host wiring
+  useEffect(() => {
+    const handler = (e) => {
+      const d = e.data || {};
+      if (d.type === '__activate_edit_mode') setTweaksOpen(true);
+      if (d.type === '__deactivate_edit_mode') setTweaksOpen(false);
+    };
+    window.addEventListener('message', handler);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', handler);
+  }, []);
+
+  useEffect(() => { document.body.classList.toggle('dark', !!tweaks.dark); }, [tweaks.dark]);
+
+  const basePalette = getPalette(tweaks.palette, tweaks.dark);
+  const plush = tweaks.plush;
+  const theme = {
+    ...basePalette,
+    plushShadow: tweaks.dark
+      ? `0 ${2 + plush * 8}px ${8 + plush * 20}px rgba(0,0,0,${0.18 + plush * 0.2}), 0 1px 2px rgba(0,0,0,0.35)`
+      : `0 ${2 + plush * 6}px ${8 + plush * 20}px rgba(62,45,30,${0.04 + plush * 0.08}), 0 1px 2px rgba(62,45,30,0.04)`,
+    roundness: tweaks.roundness,
+  };
+
+  const content = () => {
+    if (tab === 'home') return <Dashboard
+      theme={theme} voice={tweaks.voice}
+      layout={layout} setLayout={setLayout}
+      editMode={editMode} setEditMode={setEditMode}
+      onOpenSummary={() => setSummaryOpen(true)}
+    />;
+    if (tab === 'pockets') return <PocketsScreen theme={theme} />;
+    if (tab === 'budgets') return <BudgetsScreen theme={theme} />;
+    if (tab === 'insights') return <InsightsScreen theme={theme} voice={tweaks.voice} />;
+    if (tab === 'mood') return <MoodScreen theme={theme} />;
+    return null;
+  };
+
+  return (
+    <div className={`cs-device ${tweaks.dark ? 'dark-frame' : ''}`} style={{ background: theme.bg }}>
+      <div className="cs-island" />
+
+      {/* Status bar at top — fixed */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 30 }}>
+        <IOSStatusBar dark={tweaks.dark} />
+      </div>
+
+      {/* Top brand bar — fixed */}
+      <div style={{
+        position: 'absolute', top: 52, left: 0, right: 0, zIndex: 25,
+        padding: '8px 20px 8px',
+        background: `linear-gradient(to bottom, ${theme.bg} 70%, ${theme.bg}cc 100%)`,
+        backdropFilter: 'blur(6px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{
+            width: 26, height: 26, borderRadius: 9,
+            background: `radial-gradient(circle at 30% 30%, ${theme.peach}, ${theme.peachDeep})`,
+            boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.1), inset 1px 1px 2px rgba(255,255,255,0.4)`,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: '"Newsreader", serif', fontWeight: 500, fontSize: 17, color: theme.ink,
+            fontStyle: 'italic',
+          }}>c</div>
+          <div style={{ fontFamily: '"Newsreader", serif', fontSize: 17, fontWeight: 500, color: theme.ink, letterSpacing: -0.2 }}>
+            centsible
+          </div>
+        </div>
+        <button onClick={() => setTweaksOpen(!tweaksOpen)} style={{
+          padding: '6px 11px', borderRadius: 9999,
+          background: theme.card, border: `1px solid ${theme.line}`,
+          color: theme.inkSoft, fontFamily: 'Nunito', fontSize: 11, fontWeight: 700, cursor: 'pointer',
+          boxShadow: theme.plushShadow,
+        }}>⚙ tweaks</button>
+      </div>
+
+      {/* Scrollable content area — under top bar, above tab bar */}
+      <div ref={scrollRef} className="cs-scroll" style={{ top: 92, background: theme.bg }}>
+        {content()}
+      </div>
+
+      {/* Tab bar — pinned to device frame */}
+      <TabBar theme={theme} active={tab} onChange={setTab} onAdd={() => setTxnOpen(true)} />
+
+      {/* Home indicator */}
+      <div className="cs-home-indicator"><div /></div>
+
+      {/* Overlays */}
+      {txnOpen && <TxnModal theme={theme} onClose={() => setTxnOpen(false)} onSubmit={() => {}} />}
+      {summaryOpen && <WeeklySummary theme={theme} onClose={() => setSummaryOpen(false)} />}
+      {tweaksOpen && <TweaksPanel tweaks={tweaks} setTweaks={setTweaks} onClose={() => setTweaksOpen(false)} />}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

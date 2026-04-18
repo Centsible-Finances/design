@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Centsible · Logo exploration</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Nunito:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { font-family: 'Nunito', sans-serif; background: #f0eee9; overflow: hidden; }
+  ::-webkit-scrollbar { width: 0; height: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="design-canvas.jsx"></script>
+<script type="text/babel" src="logo-marks.jsx"></script>
+<script type="text/babel">
+const { useState, useEffect } = React;
+
+const CONCEPTS = [
+  {
+    id: '01',
+    name: 'Sprout coin',
+    tag: 'savings that grow',
+    Mark: MarkSproutCoin,
+    variants: [
+      { label: 'sage', props: { bg: LC.sage, leaf: LC.sageDark, stem: LC.sageDark, coinTone: LC.oatDeep } },
+      { label: 'oat + sage', props: { bg: LC.oat, leaf: LC.sageDeep, stem: LC.sageDeep, coinTone: LC.coral } },
+      { label: 'lavender', props: { bg: LC.lavender, leaf: LC.sageDark, stem: LC.sageDark, coinTone: LC.cream } },
+    ],
+  },
+  {
+    id: '02',
+    name: 'Journal leaf',
+    tag: 'a money journal',
+    Mark: MarkJournalLeaf,
+    variants: [
+      { label: 'oat + coral', props: { bg: LC.oat, book: LC.coral, leaf: LC.sageDeep } },
+      { label: 'sage + oat', props: { bg: LC.sage, book: LC.oat, leaf: LC.sageDark, page: LC.cream } },
+      { label: 'lavender + coral', props: { bg: LC.lavender, book: LC.coral, leaf: LC.sageDeep } },
+    ],
+  },
+  {
+    id: '03',
+    name: 'C-sprout',
+    tag: 'letterform + leaf',
+    Mark: MarkCSprout,
+    variants: [
+      { label: 'sage + ink', props: { bg: LC.sage, ink: LC.ink, leaf: LC.sageDark } },
+      { label: 'oat + sage', props: { bg: LC.oat, ink: LC.sageDark, leaf: LC.coralDeep } },
+      { label: 'coral + ink', props: { bg: LC.coral, ink: LC.ink, leaf: LC.sageDark } },
+    ],
+  },
+  {
+    id: '04',
+    name: 'Pocket leaf',
+    tag: 'pockets metaphor',
+    Mark: MarkPocketLeaf,
+    variants: [
+      { label: 'oat + coral', props: { bg: LC.oatDeep, pocket: LC.coral, leaf: LC.sageDeep } },
+      { label: 'sage + oat', props: { bg: LC.sage, pocket: LC.oat, leaf: LC.sageDark } },
+      { label: 'lavender + coral', props: { bg: LC.lavender, pocket: LC.coral, leaf: LC.sageDeep } },
+    ],
+  },
+  {
+    id: '05',
+    name: 'Cent leaf',
+    tag: '¢ rebuilt organic',
+    Mark: MarkCentLeaf,
+    variants: [
+      { label: 'lavender + ink', props: { bg: LC.lavender, ink: LC.ink, leaf: LC.sageDeep } },
+      { label: 'sage + ink', props: { bg: LC.sage, ink: LC.ink, leaf: LC.sageDark } },
+      { label: 'oat + sage', props: { bg: LC.oat, ink: LC.sageDark, leaf: LC.coralDeep } },
+    ],
+  },
+  {
+    id: '06',
+    name: 'Heart coin',
+    tag: 'money + care',
+    Mark: MarkHeartCoin,
+    variants: [
+      { label: 'oat + coral', props: { bg: LC.oat, coin: LC.coral } },
+      { label: 'sage + cream', props: { bg: LC.sage, coin: LC.cream } },
+      { label: 'lavender + coral', props: { bg: LC.lavender, coin: LC.coral } },
+    ],
+  },
+  {
+    id: '07',
+    name: 'Moon pouch',
+    tag: 'held, cradled',
+    Mark: MarkMoonPouch,
+    variants: [
+      { label: 'oat + sage', props: { bg: LC.oat, moon: LC.sageDeep, seed: LC.coral } },
+      { label: 'sage + cream', props: { bg: LC.sage, moon: LC.sageDark, seed: LC.cream } },
+      { label: 'lavender + sage', props: { bg: LC.lavender, moon: LC.sageDeep, seed: LC.coral } },
+    ],
+  },
+  {
+    id: '08',
+    name: 'Breath ring',
+    tag: 'mindful, minimal',
+    Mark: MarkBreathRing,
+    variants: [
+      { label: 'sage', props: { bg: LC.sage, outer: LC.sageDark, inner: LC.oat } },
+      { label: 'oat + sage', props: { bg: LC.oat, outer: LC.sageDeep, inner: LC.sage } },
+      { label: 'lavender', props: { bg: LC.lavender, outer: LC.lavenderDeep, inner: LC.oat } },
+    ],
+  },
+];
+
+// A single concept row — big mark, scale ladder, color variants, wordmark lockup
+function ConceptRow({ concept }) {
+  const { id, name, tag, Mark, variants } = concept;
+  const primary = variants[0];
+
+  return (
+    <DCSection title={`${id} · ${name}`} subtitle={tag} gap={32}>
+      {/* hero artboard — 320 mark on oat */}
+      <DCArtboard label="Hero · 320" width={420} height={420} style={{ background: LC.oat }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
+          <Mark size={320} {...primary.props} />
+        </div>
+      </DCArtboard>
+
+      {/* scale ladder */}
+      <DCArtboard label="Scale ladder · 24 / 44 / 80 / 140" width={440} height={420} style={{ background: LC.cream }}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 24, height: '100%', padding: 24 }}>
+          <Mark size={24} {...primary.props} />
+          <Mark size={44} {...primary.props} />
+          <Mark size={80} {...primary.props} />
+          <Mark size={140} {...primary.props} />
+        </div>
+      </DCArtboard>
+
+      {/* color variants */}
+      <DCArtboard label="Color variants" width={520} height={420} style={{ background: '#fff' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', height: '100%' }}>
+          {variants.map((v, i) => (
+            <div key={i} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+              gap: 12, borderRight: i < 2 ? '1px solid rgba(0,0,0,0.05)' : 'none',
+            }}>
+              <Mark size={120} {...v.props} />
+              <div style={{
+                fontFamily: '"JetBrains Mono", monospace', fontSize: 10,
+                color: '#7A6A5F', letterSpacing: 0.5,
+              }}>{v.label}</div>
+            </div>
+          ))}
+        </div>
+      </DCArtboard>
+
+      {/* horizontal lockup */}
+      <DCArtboard label="Horizontal lockup · serif wordmark" width={480} height={420} style={{ background: LC.oat }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 40 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
+            <Mark size={88} {...primary.props} />
+            <Wordmark size={56} color={LC.ink} style="serif" />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Mark size={40} {...primary.props} />
+            <Wordmark size={26} color={LC.ink} style="serif" />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Mark size={22} {...primary.props} />
+            <Wordmark size={15} color={LC.ink} style="serif" />
+          </div>
+        </div>
+      </DCArtboard>
+
+      {/* contexts: app icon + safari tab + notification */}
+      <DCArtboard label="Contexts" width={540} height={420} style={{ background: '#E5DFD2' }}>
+        <div style={{ padding: 28, display: 'flex', flexDirection: 'column', gap: 20, height: '100%' }}>
+          {/* iOS app icon row */}
+          <div style={{ display: 'flex', gap: 14, alignItems: 'center' }}>
+            <div style={{ borderRadius: 26, overflow: 'hidden', boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}>
+              <Mark size={118} {...primary.props} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontSize: 12, color: LC.ink, fontWeight: 600 }}>Centsible</div>
+              <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: LC.inkSoft }}>iOS · 118px · r26</div>
+            </div>
+          </div>
+          {/* notification */}
+          <div style={{
+            background: LC.cream, borderRadius: 18, padding: 14,
+            display: 'flex', gap: 12, alignItems: 'center',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          }}>
+            <div style={{ borderRadius: 10, overflow: 'hidden', flexShrink: 0 }}>
+              <Mark size={38} {...primary.props} />
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontFamily: '"Nunito", sans-serif', fontSize: 11, color: LC.inkSoft, fontWeight: 600, letterSpacing: 0.3 }}>CENTSIBLE · now</div>
+              <div style={{ fontFamily: '"Newsreader", serif', fontStyle: 'italic', fontSize: 14, color: LC.ink, marginTop: 2 }}>
+                You saved $12 today. Gentle win.
+              </div>
+            </div>
+          </div>
+          {/* favicon strip */}
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center', marginTop: 'auto' }}>
+            <div style={{
+              background: LC.cream, borderRadius: 6, padding: '6px 10px 6px 6px',
+              display: 'flex', alignItems: 'center', gap: 6,
+              fontFamily: '"Nunito", sans-serif', fontSize: 11, color: LC.inkSoft,
+            }}>
+              <Mark size={16} {...primary.props} />
+              Centsible
+            </div>
+            <div style={{ fontFamily: '"JetBrains Mono", monospace', fontSize: 10, color: LC.inkSoft }}>favicon · 16px</div>
+          </div>
+        </div>
+      </DCArtboard>
+    </DCSection>
+  );
+}
+
+function App() {
+  return (
+    <DesignCanvas>
+      {/* ── Title block ─────────────────────────── */}
+      <div style={{ padding: '0 60px 40px', maxWidth: 1100 }}>
+        <div style={{
+          fontFamily: '"JetBrains Mono", monospace', fontSize: 11, fontWeight: 500,
+          color: 'rgba(60,50,40,0.6)', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 14,
+        }}>Centsible · logo exploration · v1</div>
+        <div style={{
+          fontFamily: '"Newsreader", serif', fontWeight: 500, fontSize: 64,
+          letterSpacing: -1, lineHeight: 1, color: '#2a2018',
+        }}>
+          Eight marks, <em style={{ opacity: 0.55 }}>one feeling.</em>
+        </div>
+        <div style={{
+          fontFamily: '"Newsreader", serif', fontStyle: 'italic', fontSize: 18,
+          color: '#5a4a3a', marginTop: 18, maxWidth: 640, lineHeight: 1.55,
+        }}>
+          Warm sage, oatmeal, soft coral, and dusty lavender. Every mark uses the 44&nbsp;rad squircle
+          container from the app tile, with rounded strokes and no sharp geometry. Wordmark stays in
+          lowercase italic Newsreader to match the existing design system. Pick a direction and I'll
+          refine into a single final lockup.
+        </div>
+
+        {/* reading guide */}
+        <div style={{
+          marginTop: 28, display: 'flex', gap: 18, flexWrap: 'wrap',
+          fontFamily: '"Nunito", sans-serif', fontSize: 12, color: '#6a5a4a',
+        }}>
+          <Legend dot={LC.sage} label="sage (primary)" />
+          <Legend dot={LC.oat} label="oatmeal" ring />
+          <Legend dot={LC.coral} label="soft coral" />
+          <Legend dot={LC.lavender} label="dusty lavender" />
+          <Legend dot={LC.ink} label="warm ink" />
+        </div>
+      </div>
+
+      {CONCEPTS.map(c => <ConceptRow key={c.id} concept={c} />)}
+
+      {/* closing note */}
+      <div style={{ padding: '40px 60px 80px', maxWidth: 720 }}>
+        <div style={{
+          background: '#fef4a8', padding: '20px 24px',
+          fontFamily: '"Comic Sans MS", "Marker Felt", cursive', fontSize: 14, color: '#5a4a2a',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.12)', transform: 'rotate(-1deg)', lineHeight: 1.5,
+        }}>
+          Scroll horizontally in each row for the full set: hero → scale → colors → lockup → contexts.<br/>
+          My picks: <b>01 Sprout coin</b> for the warmest "savings grow" story, or <b>03 C-sprout</b>
+          &nbsp;if you want the tightest, most iconic mark. <b>08 Breath ring</b> is the mindfulness-first play.
+        </div>
+      </div>
+    </DesignCanvas>
+  );
+}
+
+function Legend({ dot, label, ring }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+      <div style={{
+        width: 14, height: 14, borderRadius: 7, background: dot,
+        boxShadow: ring ? 'inset 0 0 0 1px rgba(0,0,0,0.15)' : 'none',
+      }} />
+      {label}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
